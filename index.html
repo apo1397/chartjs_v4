@@ -313,39 +313,70 @@
 
         // Stacked Bar Chart
         const stackedBarCtx = document.getElementById('stackedBarChart').getContext('2d');
-        const stackedBarData = {
-            labels: ['Creator 1', 'Creator 2', 'Creator 3', 'Creator 4', 'Creator 5', 'Creator 6', 'Creator 7', 'Creator 8', 'Creator 9', 'Creator 10'],
-            datasets: [
-                {
-                    label: 'Instagram',
-                    data: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], // Example data
-                    backgroundColor: '#E1306C', // Instagram
-                    borderRadius: 2 // Rounded corners
-                },
-                {
-                    label: 'YouTube',
-                    data: [15, 25, 35, 45, 55, 65, 75, 85, 95, 105], // Example data
-                    backgroundColor: '#FF0000', // YouTube
-                    borderRadius: 2 // Rounded corners
-                },
-                {
-                    label: 'Facebook',
-                    data: [20, 30, 40, 50, 60, 70, 80, 90, 100, 110], // Example data
-                    backgroundColor: '#1877F2', // Facebook
-                    borderRadius: 2 // Rounded corners
-                },
-                {
-                    label: 'TikTok',
-                    data: [25, 35, 45, 55, 65, 75, 85, 95, 105, 115], // Example data
-                    backgroundColor: '#808080', // TikTok
-                    borderRadius: 2 // Rounded corners
-                }
-            ]
-        };
+
+        // Function to aggregate data for top 7 creators and "Others"
+        function aggregateData(labels, datasets) {
+            const topN = 7;
+
+            // Sort the labels and datasets based on the data values in descending order
+            const sortedIndices = datasets[0].data
+                .map((value, index) => ({ value, index }))
+                .sort((a, b) => b.value - a.value)
+                .map(item => item.index);
+
+            const aggregatedLabels = sortedIndices.slice(0, topN).map(index => labels[index]);
+            aggregatedLabels.push('Others');
+
+            const aggregatedDatasets = datasets.map(dataset => {
+                const sortedData = sortedIndices.map(index => dataset.data[index]);
+                const topData = sortedData.slice(0, topN);
+                const othersData = sortedData.slice(topN).reduce((a, b) => a + b, 0);
+                topData.push(othersData);
+                return {
+                    ...dataset,
+                    data: topData
+                };
+            });
+
+            return {
+                labels: aggregatedLabels,
+                datasets: aggregatedDatasets
+            };
+        }
+
+        const originalLabels = ['Creator 1', 'Creator 2', 'Creator 3', 'Creator 4', 'Creator 5', 'Creator 6', 'Creator 7', 'Creator 8', 'Creator 9', 'Creator 10'];
+        const originalDatasets = [
+            {
+                label: 'Instagram',
+                data: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], // Example data
+                backgroundColor: '#E1306C', // Instagram
+                borderRadius: 2 // Rounded corners
+            },
+            {
+                label: 'YouTube',
+                data: [15, 25, 35, 45, 55, 65, 75, 85, 95, 105], // Example data
+                backgroundColor: '#FF0000', // YouTube
+                borderRadius: 2 // Rounded corners
+            },
+            {
+                label: 'Facebook',
+                data: [20, 30, 40, 50, 60, 70, 80, 90, 100, 110], // Example data
+                backgroundColor: '#1877F2', // Facebook
+                borderRadius: 2 // Rounded corners
+            },
+            {
+                label: 'TikTok',
+                data: [25, 35, 45, 55, 65, 75, 85, 95, 105, 115], // Example data
+                backgroundColor: '#808080', // TikTok
+                borderRadius: 2 // Rounded corners
+            }
+        ];
+
+        const aggregatedData = aggregateData(originalLabels, originalDatasets);
 
         const stackedBarConfig = {
             type: 'bar',
-            data: stackedBarData,
+            data: aggregatedData,
             options: {
                 maintainAspectRatio: false, // Disable default aspect ratio
                 responsive: true,
@@ -434,7 +465,7 @@
 
         // Generate the custom legend for stacked bar chart
         const stackedBarLegendContainer = document.getElementById('stackedBarLegend');
-        stackedBarLegendContainer.innerHTML = stackedBarData.datasets.map((dataset) => {
+        stackedBarLegendContainer.innerHTML = aggregatedData.datasets.map((dataset) => {
             const color = dataset.backgroundColor;
             return `<span style="background-color:${color};width:12px;height:12px;display:inline-block;margin-right:2px;border-radius:50%;"></span><span style="margin-right:10px;">${dataset.label}</span>`;
         }).join('');

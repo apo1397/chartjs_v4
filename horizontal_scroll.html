@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chart with Horizontal Scroll</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .chart-container {
+      width: 600px; /* Fixed container width */
+      overflow-x: auto; /* Enable horizontal scroll */
+    }
+
+    canvas {
+      width: 1200px; /* Set larger width dynamically */
+    }
+  </style>
+</head>
+<body>
+
+<div class="chart-container">
+  <canvas id="myChart"></canvas>
+</div>
+
+<script>
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var numberOfDataPoints = 15; // Number of data points
+
+  // Set canvas width dynamically based on the number of data points
+  ctx.canvas.width = numberOfDataPoints * 80; // Adjust 80 based on how wide you want each bar
+
+  var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Extra1', 'Extra2', 'Extra3'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 19, 3, 5, 2, 3, 9, 14, 7, 8, 6, 4, 10, 13, 11],
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      maintainAspectRatio: false, // Disable maintaining aspect ratio to allow the chart to grow horizontally
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: {
+            autoSkip: false // Ensure every label is displayed
+          }
+        },
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

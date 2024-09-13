@@ -53,7 +53,23 @@
 </head>
 <body>
     <h1 style="text-align: center;">ChartJS v4.4</h1>
-
+    <p style="text-align: center;">
+        Note:
+        <ul>
+            <li>Had to move legend out of the canvas so they're not clickable</li>
+            <li>Won't show label value if width is less than 5% of the chart</li>
+            <li>Added "Others" to double donut</li>
+            <li>Horizontal scroll for bar graphs not happening</li>
+            <li>Hover for bar graph behaving weirdly</li>
+        </ul>
+        Things yet to try:
+        <ul>
+            <li>Horizontal bar graph</li>
+            <li>Others in bar graph</li>
+            <li>Multi axis bar graph</li>
+            <li>Change the axis of data label if length of label (say 555.K) > width of bar</li>
+        </ul>
+    </p>
     <div class="chart-container">
         <!-- Double Donut Chart -->
         <div class="half-width">
@@ -114,7 +130,7 @@
                 const totalViews = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                 const totalPosts = chart.data.datasets[1].data.reduce((a, b) => a + b, 0);
                 const labelCount = doubleDonutRawData.labels.length;
-                const text = `${totalViews} views from ${totalPosts} posts\non ${labelCount} platforms`;
+                const text = `${numberFormatter(totalViews)} views from ${totalPosts} posts\non ${labelCount} platforms`;
 
                 const lines = text.split('\n');
                 const textX = width / 2;
@@ -292,7 +308,7 @@
         const doubleDonutLegendContainer = document.getElementById('doubleDonutLegend');
         doubleDonutLegendContainer.innerHTML = doubleDonutChart.data.labels.map((label, index) => {
             const color = doubleDonutChart.data.datasets[0].backgroundColor[index];
-            return `<span style="background-color:${color};width:12px;height:12px;display:inline-block;margin-right:2px;"></span><span style="margin-right:10px;">${label}</span>`;
+            return `<span style="background-color:${color};width:12px;height:12px;display:inline-block;margin-right:2px;border-radius:50%;"></span><span style="margin-right:10px;">${label}</span>`;
         }).join('');
 
         // Stacked Bar Chart
@@ -420,7 +436,7 @@
         const stackedBarLegendContainer = document.getElementById('stackedBarLegend');
         stackedBarLegendContainer.innerHTML = stackedBarData.datasets.map((dataset) => {
             const color = dataset.backgroundColor;
-            return `<span style="background-color:${color};width:12px;height:12px;display:inline-block;margin-right:2px;"></span><span style="margin-right:10px;">${dataset.label}</span>`;
+            return `<span style="background-color:${color};width:12px;height:12px;display:inline-block;margin-right:2px;border-radius:50%;"></span><span style="margin-right:10px;">${dataset.label}</span>`;
         }).join('');
 
         // Single Donut Charts Data
@@ -530,7 +546,7 @@
             const legendContainer = document.getElementById(legendId);
             legendContainer.innerHTML = chart.data.labels.map((label, index) => {
                 const color = chart.data.datasets[0].backgroundColor[index];
-                return `<span style="background-color:${color};width:12px;height:12px;display:inline-block;margin-right:2px;"></span><span style="margin-right:10px;">${label}</span>`;
+                return `<span style="background-color:${color};width:12px;height:12px;display:inline-block;margin-right:2px;border-radius:50%;"></span><span style="margin-right:10px;">${label}</span>`;
             }).join('');
         }
 

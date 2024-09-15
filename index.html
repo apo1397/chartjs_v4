@@ -73,14 +73,17 @@
     <div class="chart-container">
         <!-- Double Donut Chart -->
         <div class="half-width">
-            <h2>Double Donut Chart</h2>
+            <h2 style="display: inline-block;">Double Donut Chart</h2>
+            <button id="randomizeDoubleDonutData" style="display: inline-block; margin-left: 10px;">Randomize Data</button> <!-- Added button -->
             <canvas id="doubleDonutChart"></canvas>
             <div id="doubleDonutLegend" class="legend-container"></div>
+            
         </div>
 
         <!-- Stacked Bar Chart -->
         <div id="stackedBarChartContainer" class="half-width">
-            <h2>Stacked Bar Chart</h2>
+            <h2 style="display: inline-block;">Stacked Bar Chart</h2>
+            <button id="randomizeStackedBarData" style="display: inline-block; margin-left: 10px;">Randomize Data</button> <!-- Added button -->
             <canvas id="stackedBarChart"></canvas>
             <div id="stackedBarLegend" class="legend-container"></div>
         </div>
@@ -496,6 +499,7 @@
 
         // Function to create single donut charts
         function createSingleDonutChart(ctx, data, legendId, platform) {
+            const chartContainer = ctx.canvas.parentNode;
             const chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -579,6 +583,15 @@
                 const color = chart.data.datasets[0].backgroundColor[index];
                 return `<span style="background-color:${color};width:12px;height:12px;display:inline-block;margin-right:2px;border-radius:50%;"></span><span style="margin-right:10px;">${label}</span>`;
             }).join('');
+
+            // Add randomize button
+            const randomizeButton = document.createElement('button');
+            randomizeButton.textContent = 'Randomize Data';
+            randomizeButton.addEventListener('click', () => {
+                chart.data.datasets[0].data = randomizeData(chart.data.datasets[0].data);
+                chart.update();
+            });
+            chartContainer.appendChild(randomizeButton);
         }
 
         // Create single donut charts
@@ -586,6 +599,41 @@
         createSingleDonutChart(document.getElementById('youtubeDonutChart').getContext('2d'), singleDonutData.youtube, 'youtubeDonutLegend', 'YouTube');
         createSingleDonutChart(document.getElementById('facebookDonutChart').getContext('2d'), singleDonutData.facebook, 'facebookDonutLegend', 'Facebook');
         createSingleDonutChart(document.getElementById('tiktokDonutChart').getContext('2d'), singleDonutData.tiktok, 'tiktokDonutLegend', 'TikTok');
+
+        // Function to randomize data
+        function randomizeData(data) {
+            return data.map(() => Math.floor(Math.random() * 5000) + 1);
+        }
+
+        // Event listener for the randomize button for Double Donut Chart
+        document.getElementById('randomizeDoubleDonutData').addEventListener('click', () => {
+            doubleDonutChart.data.datasets[0].data = randomizeData(doubleDonutChart.data.datasets[0].data);
+            doubleDonutChart.data.datasets[1].data = randomizeData(doubleDonutChart.data.datasets[1].data);
+            doubleDonutChart.update();
+        });
+
+        // Event listener for the randomize button for Stacked Bar Chart
+        document.getElementById('randomizeStackedBarData').addEventListener('click', () => {
+            stackedBarChart.data.datasets.forEach(dataset => {
+                dataset.data = randomizeData(dataset.data);
+            });
+
+            // Recalculate the sorting order of the creators
+            const sortedData = stackedBarChart.data.datasets.map(dataset => {
+                return dataset.data.map((value, index) => ({
+                    label: stackedBarChart.data.labels[index],
+                    value: value
+                })).sort((a, b) => b.value - a.value);
+            });
+
+            // Update the chart data with the sorted order
+            sortedData.forEach((sortedDataset, datasetIndex) => {
+                stackedBarChart.data.labels = sortedDataset.map(item => item.label);
+                stackedBarChart.data.datasets[datasetIndex].data = sortedDataset.map(item => item.value);
+            });
+
+            stackedBarChart.update();
+        });
     </script>
 </body>
 </html>
